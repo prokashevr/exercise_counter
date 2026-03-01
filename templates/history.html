@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout History</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Black', 'Arial Bold', sans-serif;
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            border-bottom: 4px solid #ffffff;
+            padding-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #999;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 14px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background: #000000;
+            color: #ffffff;
+            box-shadow: inset 0 0 0 2px #ffffff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            color: #000000;
+            padding: 30px;
+            text-align: center;
+            border: 4px solid #000000;
+        }
+
+        .stat-value {
+            font-size: 3em;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .sessions-list {
+            display: grid;
+            gap: 30px;
+        }
+
+        .session-card {
+            background: #1a1a1a;
+            border: 3px solid #ffffff;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .session-card:hover {
+            background: #ffffff;
+            color: #000000;
+            transform: translateX(10px);
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid currentColor;
+        }
+
+        .session-date {
+            font-size: 1.1em;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .session-total {
+            font-size: 2em;
+            font-weight: 900;
+        }
+
+        .rounds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .round-item {
+            background: currentColor;
+            color: #000000;
+            padding: 15px;
+            text-align: center;
+            font-weight: 900;
+        }
+
+        .session-card:hover .round-item {
+            background: #000000;
+            color: #ffffff;
+        }
+
+        .round-label {
+            font-size: 0.8em;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .round-value {
+            font-size: 1.5em;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 100px 20px;
+            font-size: 1.5em;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            font-size: 2em;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-btn">← Back to Workout</a>
+
+    <div class="header">
+        <h1>History</h1>
+        <div class="subtitle">Performance Records</div>
+    </div>
+
+    <div class="container">
+        <div class="stats-grid" id="stats-grid" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-value" id="total-sessions">0</div>
+                <div class="stat-label">Total Sessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="total-jumps">0</div>
+                <div class="stat-label">Total Jumps</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avg-jumps">0</div>
+                <div class="stat-label">Avg Per Session</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="best-session">0</div>
+                <div class="stat-label">Best Session</div>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">Loading...</div>
+        <div id="sessions-list" class="sessions-list"></div>
+        <div id="no-data" class="no-data" style="display: none;">No workout sessions recorded yet</div>
+    </div>
+
+    <script>
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            const options = {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        function loadHistory() {
+            fetch('/api/sessions')
+                .then(response => response.json())
+                .then(data => {
+                    const loading = document.getElementById('loading');
+                    const sessionsList = document.getElementById('sessions-list');
+                    const noData = document.getElementById('no-data');
+                    const statsGrid = document.getElementById('stats-grid');
+
+                    loading.style.display = 'none';
+
+                    if (data.ok && data.sessions && data.sessions.length > 0) {
+                        const sessions = data.sessions;
+
+                        // Calculate statistics
+                        const totalSessions = sessions.length;
+                        const totalJumps = sessions.reduce((sum, s) => sum + s.total_jumps, 0);
+                        const avgJumps = Math.round(totalJumps / totalSessions);
+                        const bestSession = Math.max(...sessions.map(s => s.total_jumps));
+
+                        document.getElementById('total-sessions').textContent = totalSessions;
+                        document.getElementById('total-jumps').textContent = totalJumps.toLocaleString();
+                        document.getElementById('avg-jumps').textContent = avgJumps;
+                        document.getElementById('best-session').textContent = bestSession;
+
+                        statsGrid.style.display = 'grid';
+
+                        // Display sessions
+                        sessionsList.innerHTML = sessions.map(session => `
+                            <div class="session-card">
+                                <div class="session-header">
+                                    <div class="session-date">${formatDate(session.trained_at)}</div>
+                                    <div class="session-total">${session.total_jumps} JUMPS</div>
+                                </div>
+                                <div class="rounds-grid">
+                                    ${session.rounds.map(round => `
+                                        <div class="round-item">
+                                            <div class="round-label">ROUND ${round.round_index}</div>
+                                            <div class="round-value">${round.jumps}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        noData.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading history:', error);
+                    document.getElementById('loading').textContent = 'Error loading data';
+                });
+        }
+
+        // Load history on page load
+        loadHistory();
+    </script>
+</body>
+</html>
