@@ -1,0 +1,167 @@
+from flask import Flask, render_template, Response
+import cv2
+import mediapipe as mp
+import time
+import numpy as np
+
+app = Flask(__name__)
+
+# Initialize MediaPipe Pose
+mp_pose = mp.solutions.pose
+mp_drawing = mp.solutions.drawing_utils
+
+# Global variables for counter state
+counter = 0
+stage = "down"
+last_activity_time = time.time()
+reset_delay = 7
+signal_50 = False
+signal_100 = False
+
+def calculate_angle(a, b, c):
+    a = np.array(a)
+    b = np.array(b)
+    c = np.array(c)
+
+    radians = np.arctan2(c[1]-b[1], c[0]-b[0]) - np.arctan2(a[1]-b[1], a[0]-b[0])
+    angle = np.abs(radians*180.0/np.pi)
+
+    if angle > 180.0:
+        angle = 360 - angle
+
+    return angle
+
+def generate_frames():
+    global counter, stage, last_activity_time, signal_50, signal_100
+
+    cap = cv2.VideoCapture(0)
+    pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        # Recolor image to RGB
+        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        image.flags.writeable = False
+
+        # Make detection
+        results = pose.process(image)
+
+        # Recolor back to BGR
+        image.flags.writeable = True
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+        current_time = time.time()
+
+        try:
+            landmarks = results.pose_landmarks.landmark
+
+            # Get coordinates for jumping jack detection
+            left_shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
+                           landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+            right_shoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
+                            landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+
+            left_wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
+                         landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+            right_wrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
+                          landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
+
+            # Arms are UP if wrists are above shoulders
+            arms_up = left_wrist[1] < left_shoulder[1] and right_wrist[1] < right_shoulder[1]
+
+            if arms_up and stage == "down":
+                stage = "up"
+                last_activity_time = current_time
+            if not arms_up and stage == "up":
+                stage = "down"
+                counter += 1
+                last_activity_time = current_time
+
+            # Signal check
+            if counter == 50 and not signal_50:
+                signal_50 = True
+            if counter == 100 and not signal_100:
+                signal_100 = True
+
+        except Exception as e:
+            pass
+
+        # Check for inactivity reset
+        time_since_last_activity = current_time - last_activity_time
+        if time_since_last_activity > reset_delay:
+            if counter > 0:
+                counter = 0
+                signal_50 = False
+                signal_100 = False
+            last_activity_time = current_time
+
+        # Render counter - Vertical layout on left side
+        cv2.rectangle(image, (0,0), (200, 440), (245, 117, 16), -1)
+
+        # Rep data
+        cv2.putText(image, 'REPS', (15,40),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,0), 2, cv2.LINE_AA)
+        cv2.putText(image, str(counter),
+                    (20,140),
+                    cv2.FONT_HERSHEY_SIMPLEX, 4, (255,255,255), 5, cv2.LINE_AA)
+
+        # Stage data
+        cv2.putText(image, 'STAGE', (15,200),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0,0,0), 2, cv2.LINE_AA)
+        cv2.putText(image, stage,
+                    (20,270),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255,255,255), 3, cv2.LINE_AA)
+
+        # Reset timer
+        if counter > 0:
+            remaining = max(0, reset_delay - time_since_last_activity)
+            cv2.putText(image, f'{remaining:.1f}s', (30, 320),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)
+
+        # Signal markers
+        if counter >= 50:
+            cv2.putText(image, '50!', (50, 360),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 3, cv2.LINE_AA)
+        if counter >= 100:
+            cv2.putText(image, '100!', (40, 400),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 3, cv2.LINE_AA)
+
+        # Draw landmarks
+        mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
+                                 mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=2),
+                                 mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2))
+
+        # Encode frame
+        ret, buffer = cv2.imencode('.jpg', image)
+        frame = buffer.tobytes()
+
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+    cap.release()
+    pose.close()
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(generate_frames(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/reset')
+def reset():
+    global counter, stage, signal_50, signal_100, last_activity_time
+    counter = 0
+    stage = "down"
+    signal_50 = False
+    signal_100 = False
+    last_activity_time = time.time()
+    return {'status': 'reset', 'counter': counter}
+
+if __name__ == '__main__':
+    app.run(debug=True, threaded=True)
