@@ -212,7 +212,15 @@ def reset():
     signal_50 = False
     signal_100 = False
     last_activity_time = time.time()
-    return {'status': 'reset', 'counter': counter}
+
+    # Return updated session info
+    total_jumps = sum(round_history)
+    return {
+        'status': 'reset',
+        'counter': counter,
+        'round_count': len(round_history),
+        'total_jumps': total_jumps
+    }
 
 @app.route('/api/current_session')
 def get_current_session():
