@@ -188,6 +188,10 @@ def index():
 def history():
     return render_template('history.html')
 
+@app.route('/reps-counter')
+def reps_counter():
+    return render_template('reps_counter.html')
+
 @app.route('/video_feed')
 def video_feed():
     return Response(generate_frames(),
