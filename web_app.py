@@ -15,6 +15,9 @@ DB_NAME = 'workouts.db'
 mp_pose = mp.solutions.pose
 mp_drawing = mp.solutions.drawing_utils
 
+# Pose model is expensive to initialize; build it once at startup and reuse.
+pose_model = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
+
 # Global variables for counter state
 counter = 0
 stage = "down"
@@ -71,7 +74,6 @@ def generate_frames():
     global counter, stage, last_activity_time, signal_50, signal_100
 
     cap = cv2.VideoCapture(0)
-    pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
     while True:
         ret, frame = cap.read()
@@ -83,7 +85,7 @@ def generate_frames():
         image.flags.writeable = False
 
         # Make detection
-        results = pose.process(image)
+        results = pose_model.process(image)
 
         # Recolor back to BGR
         image.flags.writeable = True
@@ -178,7 +180,6 @@ def generate_frames():
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
     cap.release()
-    pose.close()
 
 @app.route('/')
 def index():

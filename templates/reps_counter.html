@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Reps &amp; Rounds Counter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0d14;
+            --surface: #121722;
+            --surface-2: #1a2030;
+            --border: #242b3d;
+            --border-soft: #1e2536;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --accent: #4ade80;
+            --accent-hover: #22c55e;
+            --accent-soft: rgba(74, 222, 128, 0.12);
+            --accent-ring: rgba(74, 222, 128, 0.25);
+            --danger: #f87171;
+            --danger-soft: rgba(248, 113, 113, 0.12);
+
+            --chip-1: #ef4444;
+            --chip-1-hi: #f87171;
+            --chip-3: #3b82f6;
+            --chip-3-hi: #60a5fa;
+            --chip-5: #10b981;
+            --chip-5-hi: #34d399;
+            --chip-10: #f59e0b;
+            --chip-10-hi: #fbbf24;
+
+            --radius: 14px;
+            --radius-sm: 10px;
+            --radius-lg: 20px;
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+            --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px 48px;
+            background:
+                radial-gradient(1000px 500px at 50% -200px, rgba(74, 222, 128, 0.06), transparent 60%),
+                var(--bg);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            max-width: 780px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* ── Stats bar ── */
+        .session-info {
+            background: var(--surface-2);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .session-stat {
+            text-align: center;
+            padding: 18px 12px;
+        }
+
+        .session-stat + .session-stat {
+            border-left: 1px solid var(--border-soft);
+        }
+
+        .session-label {
+            font-size: 0.6875rem;
+            color: var(--text-dim);
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .session-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .session-stat:nth-child(2) .session-value { color: var(--accent); }
+
+        /* ── Chips ── */
+        .chips-section {
+            padding: 32px 24px;
+            background: var(--surface);
+        }
+
+        .chips-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            justify-items: center;
+        }
+
+        .chip {
+            width: 100%;
+            max-width: 130px;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: none;
+            font-family: inherit;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.12s ease, box-shadow 0.15s ease;
+            box-shadow:
+                inset 0 0 0 3px rgba(255, 255, 255, 0.18),
+                inset 0 0 0 10px transparent,
+                inset 0 0 0 11px rgba(255, 255, 255, 0.08),
+                0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .chip::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.18), transparent 50%);
+            pointer-events: none;
+        }
+
+        .chip:hover { transform: translateY(-2px); }
+
+        .chip:active {
+            transform: scale(0.93);
+        }
+
+        @keyframes chipPop {
+            0%   { transform: scale(0.93); filter: brightness(1.3); }
+            60%  { transform: scale(1.04); filter: brightness(1.05); }
+            100% { transform: scale(1);    filter: brightness(1); }
+        }
+
+        .chip.tapped { animation: chipPop 0.22s ease-out; }
+
+        .chip-label {
+            font-size: 0.6875rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            opacity: 0.85;
+            font-weight: 600;
+        }
+
+        .chip-1  { background: radial-gradient(circle at 30% 25%, var(--chip-1-hi), var(--chip-1) 70%); }
+        .chip-3  { background: radial-gradient(circle at 30% 25%, var(--chip-3-hi), var(--chip-3) 70%); }
+        .chip-5  { background: radial-gradient(circle at 30% 25%, var(--chip-5-hi), var(--chip-5) 70%); }
+        .chip-10 { background: radial-gradient(circle at 30% 25%, var(--chip-10-hi), var(--chip-10) 70%); }
+
+        /* ── Complete Round button ── */
+        .complete-section {
+            padding: 0 24px 24px;
+        }
+
+        .complete-btn {
+            width: 100%;
+            padding: 18px 20px;
+            background: var(--accent);
+            color: #03110a;
+            border: none;
+            font-family: inherit;
+            font-size: 0.9375rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: background 0.15s ease, transform 0.05s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .complete-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .complete-btn:active { transform: translateY(1px); }
+
+        /* ── Round history ── */
+        .history-section {
+            border-top: 1px solid var(--border-soft);
+            background: var(--surface);
+        }
+
+        .history-header {
+            padding: 16px 24px 10px;
+            font-size: 0.6875rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .round-list {
+            max-height: 240px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) var(--surface);
+        }
+
+        .round-list::-webkit-scrollbar { width: 6px; }
+        .round-list::-webkit-scrollbar-track { background: var(--surface); }
+        .round-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .round-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        .round-entry-label {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .round-entry-reps {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--text);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .round-entry-reps .unit {
+            font-size: 0.6875rem;
+            color: var(--text-dim);
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-left: 4px;
+        }
+
+        .no-rounds-msg {
+            padding: 20px 24px 24px;
+            color: var(--text-dim);
+            font-size: 0.8125rem;
+        }
+
+        /* ── Control buttons ── */
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 16px;
+            border-top: 1px solid var(--border-soft);
+            background: var(--surface);
+        }
+
+        .ctrl-btn {
+            background: var(--surface-2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 12px 10px;
+            font-family: inherit;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .ctrl-btn:hover {
+            background: var(--surface);
+            border-color: var(--border-soft);
+        }
+
+        .ctrl-btn:active { transform: translateY(1px); }
+
+        .ctrl-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .ctrl-btn.dark {
+            background: transparent;
+            border-color: var(--border-soft);
+            color: var(--text-muted);
+        }
+
+        .ctrl-btn.dark:hover {
+            background: var(--surface-2);
+            color: var(--text);
+        }
+
+        /* ── Status message ── */
+        .status-message {
+            margin: 0 16px 16px;
+            padding: 12px 16px;
+            font-weight: 500;
+            font-size: 0.8125rem;
+            letter-spacing: 0.01em;
+            text-align: center;
+            border-radius: var(--radius-sm);
+            display: none;
+        }
+
+        .status-message.show { display: block; }
+
+        .status-message.success {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border: 1px solid var(--accent-ring);
+        }
+
+        .status-message.error {
+            background: var(--danger-soft);
+            color: var(--danger);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+
+        /* ── Session meta ── */
+        .session-meta {
+            padding: 12px 24px 18px;
+            font-size: 0.6875rem;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            text-align: right;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        @media (max-width: 640px) {
+            h1 { font-size: 1.5rem; }
+            .chips-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+            .chip { font-size: 1.375rem; }
+            .chips-section { padding: 24px 18px; }
+            .complete-section { padding: 0 18px 18px; }
+            .session-value { font-size: 1.5rem; }
+            .controls { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 400px) {
+            .session-value { font-size: 1.25rem; }
+            .chip { font-size: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Reps &amp; Rounds</h1>
+        <div class="tagline">Manual chip counter</div>
+    </div>
+
+    <div class="container">
+
+        <!-- Live stats bar -->
+        <div class="session-info">
+            <div class="session-stat">
+                <div class="session-label">Session</div>
+                <div class="session-value" id="stat-session">0</div>
+            </div>
+            <div class="session-stat">
+                <div class="session-label">Current Round</div>
+                <div class="session-value" id="stat-round">0</div>
+            </div>
+            <div class="session-stat">
+                <div class="session-label">Rounds Done</div>
+                <div class="session-value" id="stat-rounds">0</div>
+            </div>
+        </div>
+
+        <!-- Poker chips -->
+        <div class="chips-section">
+            <div class="chips-grid">
+                <button class="chip chip-1"  id="chip-btn-1"  onclick="addReps(1)">
+                    +1<span class="chip-label">rep</span>
+                </button>
+                <button class="chip chip-3"  id="chip-btn-3"  onclick="addReps(3)">
+                    +3<span class="chip-label">reps</span>
+                </button>
+                <button class="chip chip-5"  id="chip-btn-5"  onclick="addReps(5)">
+                    +5<span class="chip-label">reps</span>
+                </button>
+                <button class="chip chip-10" id="chip-btn-10" onclick="addReps(10)">
+                    +10<span class="chip-label">reps</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Complete Round -->
+        <div class="complete-section">
+            <button class="complete-btn" onclick="completeRound()">Complete Round</button>
+        </div>
+
+        <!-- Round history -->
+        <div class="history-section">
+            <div class="history-header">Round History</div>
+            <div class="round-list" id="round-list">
+                <div class="no-rounds-msg">No rounds completed yet</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="ctrl-btn" id="undo-btn" onclick="undoLast()" disabled>Undo</button>
+            <button class="ctrl-btn" onclick="resetRound()">Reset Round</button>
+            <button class="ctrl-btn dark" onclick="resetSession()">Reset Session</button>
+            <button class="ctrl-btn dark" onclick="window.location.href='/'">← Workout</button>
+        </div>
+
+        <div id="status-msg" class="status-message"></div>
+
+        <div class="session-meta" id="session-meta"></div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'repsCounterState_v1';
+
+        let state = {
+            sessionTotalReps: 0,
+            currentRoundReps: 0,
+            completedRounds: 0,
+            roundHistory: [],
+            sessionStartedAt: null,
+            lastAction: null
+        };
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    const saved = JSON.parse(raw);
+                    state = { ...state, ...saved };
+                }
+            } catch (_) {}
+            if (!state.sessionStartedAt) {
+                state.sessionStartedAt = new Date().toISOString();
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (_) {}
+        }
+
+        function render() {
+            document.getElementById('stat-session').textContent = state.sessionTotalReps;
+            document.getElementById('stat-round').textContent   = state.currentRoundReps;
+            document.getElementById('stat-rounds').textContent  = state.completedRounds;
+
+            const listEl = document.getElementById('round-list');
+            if (state.roundHistory.length === 0) {
+                listEl.innerHTML = '<div class="no-rounds-msg">No rounds completed yet</div>';
+            } else {
+                listEl.innerHTML = [...state.roundHistory].reverse().map(r =>
+                    `<div class="round-entry">
+                        <span class="round-entry-label">Round ${r.roundNumber}</span>
+                        <span class="round-entry-reps">${r.reps}<span class="unit">reps</span></span>
+                    </div>`
+                ).join('');
+            }
+
+            document.getElementById('undo-btn').disabled = !state.lastAction;
+
+            if (state.sessionStartedAt) {
+                const started = new Date(state.sessionStartedAt);
+                const opts = { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' };
+                document.getElementById('session-meta').textContent =
+                    'Started ' + started.toLocaleString('en-US', opts);
+            }
+        }
+
+        function addReps(value) {
+            state.lastAction = {
+                type: 'chip',
+                prevCurrentRoundReps: state.currentRoundReps,
+                prevSessionTotalReps: state.sessionTotalReps
+            };
+
+            state.currentRoundReps  += value;
+            state.sessionTotalReps  += value;
+
+            saveState();
+            render();
+            flashChip(value);
+
+            if (navigator.vibrate) navigator.vibrate(25);
+        }
+
+        function completeRound() {
+            if (state.currentRoundReps === 0) {
+                showStatus('Add reps first', 'error');
+                return;
+            }
+
+            state.lastAction = {
+                type: 'complete',
+                prevCurrentRoundReps: state.currentRoundReps,
+                prevCompletedRounds:  state.completedRounds,
+                prevRoundHistory:     state.roundHistory.map(r => ({ ...r })),
+                prevSessionTotalReps: state.sessionTotalReps
+            };
+
+            state.completedRounds += 1;
+            state.roundHistory.push({
+                roundNumber: state.completedRounds,
+                reps: state.currentRoundReps,
+                completedAt: new Date().toISOString()
+            });
+            state.currentRoundReps = 0;
+
+            saveState();
+            render();
+
+            if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
+            showStatus(`Round ${state.completedRounds} saved`, 'success');
+        }
+
+        function undoLast() {
+            if (!state.lastAction) return;
+
+            const action = state.lastAction;
+            state.lastAction = null;
+
+            if (action.type === 'chip') {
+                state.currentRoundReps = action.prevCurrentRoundReps;
+                state.sessionTotalReps = action.prevSessionTotalReps;
+            } else if (action.type === 'complete') {
+                state.currentRoundReps = action.prevCurrentRoundReps;
+                state.completedRounds  = action.prevCompletedRounds;
+                state.roundHistory     = action.prevRoundHistory;
+                state.sessionTotalReps = action.prevSessionTotalReps;
+            }
+
+            saveState();
+            render();
+            showStatus('Undone', 'success');
+        }
+
+        function resetRound() {
+            if (state.currentRoundReps === 0) return;
+
+            state.sessionTotalReps -= state.currentRoundReps;
+            state.currentRoundReps  = 0;
+            state.lastAction        = null;
+
+            saveState();
+            render();
+            showStatus('Round reset', 'success');
+        }
+
+        function resetSession() {
+            const hasData = state.sessionTotalReps > 0 ||
+                            state.currentRoundReps > 0 ||
+                            state.completedRounds  > 0;
+            if (!hasData) return;
+
+            if (!confirm('Reset the full session? This cannot be undone.')) return;
+
+            state = {
+                sessionTotalReps: 0,
+                currentRoundReps: 0,
+                completedRounds:  0,
+                roundHistory:     [],
+                sessionStartedAt: new Date().toISOString(),
+                lastAction:       null
+            };
+
+            saveState();
+            render();
+            showStatus('Session reset', 'success');
+        }
+
+        function flashChip(value) {
+            const map = { 1: 'chip-btn-1', 3: 'chip-btn-3', 5: 'chip-btn-5', 10: 'chip-btn-10' };
+            const el = document.getElementById(map[value]);
+            if (!el) return;
+            el.classList.remove('tapped');
+            void el.offsetWidth;
+            el.classList.add('tapped');
+            el.addEventListener('animationend', () => el.classList.remove('tapped'), { once: true });
+        }
+
+        function showStatus(message, type) {
+            const el = document.getElementById('status-msg');
+            el.textContent = message;
+            el.className = 'status-message show ' + type;
+            clearTimeout(el._timer);
+            el._timer = setTimeout(() => el.classList.remove('show'), 2500);
+        }
+
+        loadState();
+        render();
+    </script>
+</body>
+</html>
