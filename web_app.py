@@ -136,36 +136,43 @@ def generate_frames():
                 signal_100 = False
             last_activity_time = current_time
 
-        # Render counter - Vertical layout on left side
-        cv2.rectangle(image, (0,0), (200, 440), (245, 117, 16), -1)
+        # Minimal HUD — just corner brackets + essential data, no panel
+        px, py = 30, 30
+        neon = (240, 220, 50)  # cyan-teal (BGR)
+        dim = (180, 180, 185)
 
-        # Rep data
-        cv2.putText(image, 'REPS', (15,40),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,0), 2, cv2.LINE_AA)
-        cv2.putText(image, str(counter),
-                    (20,140),
-                    cv2.FONT_HERSHEY_SIMPLEX, 4, (255,255,255), 5, cv2.LINE_AA)
+        # Corner brackets framing the stats area
+        bx, by, bw, bh = px, py, 190, 170
+        L = 14
+        for (cx, cy, dx, dy) in [
+            (bx, by, 1, 1),
+            (bx + bw, by, -1, 1),
+            (bx, by + bh, 1, -1),
+            (bx + bw, by + bh, -1, -1),
+        ]:
+            cv2.line(image, (cx, cy), (cx + dx * L, cy), neon, 2, cv2.LINE_AA)
+            cv2.line(image, (cx, cy), (cx, cy + dy * L), neon, 2, cv2.LINE_AA)
 
-        # Stage data
-        cv2.putText(image, 'STAGE', (15,200),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0,0,0), 2, cv2.LINE_AA)
-        cv2.putText(image, stage,
-                    (20,270),
-                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255,255,255), 3, cv2.LINE_AA)
+        # REPS — label + large sharp number
+        cv2.putText(image, 'REPS', (px + 4, py + 26),
+                    cv2.FONT_HERSHEY_PLAIN, 1.1, dim, 1, cv2.LINE_AA)
+        cv2.putText(image, f'{counter:03d}', (px + 4, py + 100),
+                    cv2.FONT_HERSHEY_TRIPLEX, 2.4, (255, 255, 255), 2, cv2.LINE_AA)
 
-        # Reset timer
+        # STAGE — single line, color shifts when active
+        stage_color = neon if stage == "up" else dim
+        cv2.putText(image, stage.upper(), (px + 4, py + 150),
+                    cv2.FONT_HERSHEY_TRIPLEX, 0.7, stage_color, 1, cv2.LINE_AA)
+
+        # Reset countdown — thin line, no labels
         if counter > 0:
             remaining = max(0, reset_delay - time_since_last_activity)
-            cv2.putText(image, f'{remaining:.1f}s', (30, 320),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2, cv2.LINE_AA)
-
-        # Signal markers
-        if counter >= 50:
-            cv2.putText(image, '50!', (50, 360),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 3, cv2.LINE_AA)
-        if counter >= 100:
-            cv2.putText(image, '100!', (40, 400),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 3, cv2.LINE_AA)
+            bar_w = bw - 8
+            filled = int(bar_w * (remaining / reset_delay))
+            cv2.line(image, (px + 4, py + bh - 14),
+                     (px + 4 + bar_w, py + bh - 14), (60, 55, 20), 1, cv2.LINE_AA)
+            cv2.line(image, (px + 4, py + bh - 14),
+                     (px + 4 + filled, py + bh - 14), neon, 2, cv2.LINE_AA)
 
         # Draw landmarks
         mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
