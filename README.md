@@ -95,6 +95,9 @@ Or using the virtual environment's Python directly:
 .venv\Scripts\python web_app.py  # On Windows
 ```
 
+To stop the application in terminal: 
+lsof -ti:5000 | xargs kill -9
+
 3. Open your web browser and navigate to:
 
 ```

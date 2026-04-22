@@ -24,15 +24,6 @@
             --danger: #f87171;
             --danger-soft: rgba(248, 113, 113, 0.12);
 
-            --chip-1: #ef4444;
-            --chip-1-hi: #f87171;
-            --chip-3: #3b82f6;
-            --chip-3-hi: #60a5fa;
-            --chip-5: #10b981;
-            --chip-5-hi: #34d399;
-            --chip-10: #f59e0b;
-            --chip-10-hi: #fbbf24;
-
             --radius: 14px;
             --radius-sm: 10px;
             --radius-lg: 20px;
@@ -145,6 +136,12 @@
         }
 
         .chip {
+            --base: #b91c1c;
+            --base-dark: #7f1313;
+            --dash: #f8fafc;
+            --face: #dc2626;
+            --face-dark: #991b1b;
+
             width: 100%;
             max-width: 130px;
             aspect-ratio: 1;
@@ -152,36 +149,81 @@
             border: none;
             font-family: inherit;
             font-size: 1.5rem;
-            font-weight: 700;
+            font-weight: 800;
             color: #fff;
             cursor: pointer;
             position: relative;
+            isolation: isolate;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform 0.12s ease, box-shadow 0.15s ease, filter 0.15s ease;
+            background:
+                radial-gradient(circle at 50% 50%,
+                    var(--face) 0 54%,
+                    rgba(0, 0, 0, 0.45) 54% 56%,
+                    transparent 56%),
+                conic-gradient(from 0deg,
+                    var(--dash) 0deg 12deg,
+                    var(--base) 12deg 78deg,
+                    var(--dash) 78deg 102deg,
+                    var(--base) 102deg 168deg,
+                    var(--dash) 168deg 192deg,
+                    var(--base) 192deg 258deg,
+                    var(--dash) 258deg 282deg,
+                    var(--base) 282deg 348deg,
+                    var(--dash) 348deg 360deg);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+            box-shadow:
+                inset 0 2px 3px rgba(255, 255, 255, 0.25),
+                inset 0 -3px 6px rgba(0, 0, 0, 0.4),
+                inset 0 0 0 1px rgba(0, 0, 0, 0.4),
+                0 8px 18px rgba(0, 0, 0, 0.5),
+                0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Dashed decorative ring on the face */
+        .chip::before {
+            content: "";
+            position: absolute;
+            inset: 22%;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.35);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Gloss / lighting overlay */
+        .chip::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background:
+                radial-gradient(ellipse 70% 50% at 35% 20%, rgba(255, 255, 255, 0.28), transparent 60%),
+                radial-gradient(ellipse 80% 60% at 65% 90%, rgba(0, 0, 0, 0.25), transparent 55%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .chip-value {
+            position: relative;
+            z-index: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 2px;
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            transition: transform 0.12s ease, box-shadow 0.15s ease;
-            box-shadow:
-                inset 0 0 0 3px rgba(255, 255, 255, 0.18),
-                inset 0 0 0 10px transparent,
-                inset 0 0 0 11px rgba(255, 255, 255, 0.08),
-                0 8px 20px rgba(0, 0, 0, 0.4);
+            line-height: 1;
         }
 
-        .chip::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            background: linear-gradient(160deg, rgba(255, 255, 255, 0.18), transparent 50%);
-            pointer-events: none;
+        .chip:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.06);
         }
-
-        .chip:hover { transform: translateY(-2px); }
 
         .chip:active {
             transform: scale(0.93);
@@ -199,14 +241,32 @@
             font-size: 0.6875rem;
             letter-spacing: 0.14em;
             text-transform: uppercase;
-            opacity: 0.85;
+            opacity: 0.9;
             font-weight: 600;
+            margin-top: 2px;
         }
 
-        .chip-1  { background: radial-gradient(circle at 30% 25%, var(--chip-1-hi), var(--chip-1) 70%); }
-        .chip-3  { background: radial-gradient(circle at 30% 25%, var(--chip-3-hi), var(--chip-3) 70%); }
-        .chip-5  { background: radial-gradient(circle at 30% 25%, var(--chip-5-hi), var(--chip-5) 70%); }
-        .chip-10 { background: radial-gradient(circle at 30% 25%, var(--chip-10-hi), var(--chip-10) 70%); }
+        /* Classic casino chip colors */
+        .chip-1 {
+            --base: #b91c1c;
+            --dash: #fef2f2;
+            --face: #dc2626;
+        }
+        .chip-3 {
+            --base: #1d4ed8;
+            --dash: #eff6ff;
+            --face: #2563eb;
+        }
+        .chip-5 {
+            --base: #15803d;
+            --dash: #f0fdf4;
+            --face: #16a34a;
+        }
+        .chip-10 {
+            --base: #0f172a;
+            --dash: #f1f5f9;
+            --face: #1e293b;
+        }
 
         /* ── Complete Round button ── */
         .complete-section {
@@ -427,16 +487,16 @@
         <div class="chips-section">
             <div class="chips-grid">
                 <button class="chip chip-1"  id="chip-btn-1"  onclick="addReps(1)">
-                    +1<span class="chip-label">rep</span>
+                    <span class="chip-value">+1<span class="chip-label">rep</span></span>
                 </button>
                 <button class="chip chip-3"  id="chip-btn-3"  onclick="addReps(3)">
-                    +3<span class="chip-label">reps</span>
+                    <span class="chip-value">+3<span class="chip-label">reps</span></span>
                 </button>
                 <button class="chip chip-5"  id="chip-btn-5"  onclick="addReps(5)">
-                    +5<span class="chip-label">reps</span>
+                    <span class="chip-value">+5<span class="chip-label">reps</span></span>
                 </button>
                 <button class="chip chip-10" id="chip-btn-10" onclick="addReps(10)">
-                    +10<span class="chip-label">reps</span>
+                    <span class="chip-value">+10<span class="chip-label">reps</span></span>
                 </button>
             </div>
         </div>
