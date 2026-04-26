@@ -1,0 +1,32 @@
+{
+    "name": "Reps & Rounds Counter",
+    "short_name": "Reps Counter",
+    "description": "Manual poker-chip-styled reps and rounds counter. Works offline.",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#0a0d14",
+    "theme_color": "#0a0d14",
+    "categories": ["fitness", "health", "utilities"],
+    "icons": [
+        {
+            "src": "icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icons/icon-maskable.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

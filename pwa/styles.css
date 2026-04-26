@@ -1,0 +1,446 @@
+:root {
+    --bg: #0a0d14;
+    --surface: #121722;
+    --surface-2: #1a2030;
+    --border: #242b3d;
+    --border-soft: #1e2536;
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --accent: #4ade80;
+    --accent-hover: #22c55e;
+    --accent-soft: rgba(74, 222, 128, 0.12);
+    --accent-ring: rgba(74, 222, 128, 0.25);
+    --danger: #f87171;
+    --danger-soft: rgba(248, 113, 113, 0.12);
+
+    --radius: 14px;
+    --radius-sm: 10px;
+    --radius-lg: 20px;
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: max(40px, env(safe-area-inset-top)) 20px max(48px, env(safe-area-inset-bottom));
+    background:
+        radial-gradient(1000px 500px at 50% -200px, rgba(74, 222, 128, 0.06), transparent 60%),
+        var(--bg);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 28px;
+    width: 100%;
+}
+
+h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+    background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.tagline {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    max-width: 780px;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+/* ── Stats bar ── */
+.session-info {
+    background: var(--surface-2);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.session-stat {
+    text-align: center;
+    padding: 18px 12px;
+}
+
+.session-stat + .session-stat {
+    border-left: 1px solid var(--border-soft);
+}
+
+.session-label {
+    font-size: 0.6875rem;
+    color: var(--text-dim);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.session-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.session-stat:nth-child(2) .session-value { color: var(--accent); }
+
+/* ── Chips ── */
+.chips-section {
+    padding: 32px 24px;
+    background: var(--surface);
+}
+
+.chips-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    justify-items: center;
+}
+
+.chip {
+    --base: #b91c1c;
+    --base-dark: #7f1313;
+    --dash: #f8fafc;
+    --face: #dc2626;
+    --face-dark: #991b1b;
+
+    width: 100%;
+    max-width: 130px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: none;
+    font-family: inherit;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    cursor: pointer;
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.12s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    background:
+        radial-gradient(circle at 50% 50%,
+            var(--face) 0 54%,
+            rgba(0, 0, 0, 0.45) 54% 56%,
+            transparent 56%),
+        conic-gradient(from 0deg,
+            var(--dash) 0deg 12deg,
+            var(--base) 12deg 78deg,
+            var(--dash) 78deg 102deg,
+            var(--base) 102deg 168deg,
+            var(--dash) 168deg 192deg,
+            var(--base) 192deg 258deg,
+            var(--dash) 258deg 282deg,
+            var(--base) 282deg 348deg,
+            var(--dash) 348deg 360deg);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+    box-shadow:
+        inset 0 2px 3px rgba(255, 255, 255, 0.25),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.4),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.4),
+        0 8px 18px rgba(0, 0, 0, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.chip::before {
+    content: "";
+    position: absolute;
+    inset: 22%;
+    border-radius: 50%;
+    border: 2px dashed rgba(255, 255, 255, 0.35);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.chip::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+        radial-gradient(ellipse 70% 50% at 35% 20%, rgba(255, 255, 255, 0.28), transparent 60%),
+        radial-gradient(ellipse 80% 60% at 65% 90%, rgba(0, 0, 0, 0.25), transparent 55%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.chip-value {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    line-height: 1;
+}
+
+.chip:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+}
+
+.chip:active {
+    transform: scale(0.93);
+}
+
+@keyframes chipPop {
+    0%   { transform: scale(0.93); filter: brightness(1.3); }
+    60%  { transform: scale(1.04); filter: brightness(1.05); }
+    100% { transform: scale(1);    filter: brightness(1); }
+}
+
+.chip.tapped { animation: chipPop 0.22s ease-out; }
+
+.chip-label {
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.9;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.chip-1 {
+    --base: #b91c1c;
+    --dash: #fef2f2;
+    --face: #dc2626;
+}
+.chip-3 {
+    --base: #1d4ed8;
+    --dash: #eff6ff;
+    --face: #2563eb;
+}
+.chip-5 {
+    --base: #15803d;
+    --dash: #f0fdf4;
+    --face: #16a34a;
+}
+.chip-10 {
+    --base: #0f172a;
+    --dash: #f1f5f9;
+    --face: #1e293b;
+}
+
+/* ── Complete Round button ── */
+.complete-section {
+    padding: 0 24px 24px;
+}
+
+.complete-btn {
+    width: 100%;
+    padding: 18px 20px;
+    background: var(--accent);
+    color: #03110a;
+    border: none;
+    font-family: inherit;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s ease, transform 0.05s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.complete-btn:hover {
+    background: var(--accent-hover);
+}
+
+.complete-btn:active { transform: translateY(1px); }
+
+/* ── Round history ── */
+.history-section {
+    border-top: 1px solid var(--border-soft);
+    background: var(--surface);
+}
+
+.history-header {
+    padding: 16px 24px 10px;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 600;
+}
+
+.round-list {
+    max-height: 240px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) var(--surface);
+}
+
+.round-list::-webkit-scrollbar { width: 6px; }
+.round-list::-webkit-scrollbar-track { background: var(--surface); }
+.round-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.round-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    border-top: 1px solid var(--border-soft);
+}
+
+.round-entry-label {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.round-entry-reps {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+}
+
+.round-entry-reps .unit {
+    font-size: 0.6875rem;
+    color: var(--text-dim);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-left: 4px;
+}
+
+.no-rounds-msg {
+    padding: 20px 24px 24px;
+    color: var(--text-dim);
+    font-size: 0.8125rem;
+}
+
+/* ── Control buttons ── */
+.controls {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 16px;
+    border-top: 1px solid var(--border-soft);
+    background: var(--surface);
+}
+
+.ctrl-btn {
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 12px 10px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ctrl-btn:hover {
+    background: var(--surface);
+    border-color: var(--border-soft);
+}
+
+.ctrl-btn:active { transform: translateY(1px); }
+
+.ctrl-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.ctrl-btn.dark {
+    background: transparent;
+    border-color: var(--border-soft);
+    color: var(--text-muted);
+}
+
+.ctrl-btn.dark:hover {
+    background: var(--surface-2);
+    color: var(--text);
+}
+
+/* ── Status message ── */
+.status-message {
+    margin: 0 16px 16px;
+    padding: 12px 16px;
+    font-weight: 500;
+    font-size: 0.8125rem;
+    letter-spacing: 0.01em;
+    text-align: center;
+    border-radius: var(--radius-sm);
+    display: none;
+}
+
+.status-message.show { display: block; }
+
+.status-message.success {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid var(--accent-ring);
+}
+
+.status-message.error {
+    background: var(--danger-soft);
+    color: var(--danger);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+/* ── Session meta ── */
+.session-meta {
+    padding: 12px 24px 18px;
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    text-align: right;
+    border-top: 1px solid var(--border-soft);
+}
+
+@media (max-width: 640px) {
+    h1 { font-size: 1.5rem; }
+    .chips-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .chip { font-size: 1.375rem; }
+    .chips-section { padding: 24px 18px; }
+    .complete-section { padding: 0 18px 18px; }
+    .session-value { font-size: 1.5rem; }
+}
+
+@media (max-width: 400px) {
+    .session-value { font-size: 1.25rem; }
+    .chip { font-size: 1.25rem; }
+}

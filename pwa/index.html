@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Reps &amp; Rounds Counter</title>
+
+    <meta name="description" content="Manual poker-chip-styled reps and rounds counter. Works offline.">
+    <meta name="theme-color" content="#0a0d14">
+    <meta name="color-scheme" content="dark">
+
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Reps Counter">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Reps &amp; Rounds</h1>
+        <div class="tagline">Manual chip counter</div>
+    </div>
+
+    <div class="container">
+
+        <div class="session-info">
+            <div class="session-stat">
+                <div class="session-label">Session</div>
+                <div class="session-value" id="stat-session">0</div>
+            </div>
+            <div class="session-stat">
+                <div class="session-label">Current Round</div>
+                <div class="session-value" id="stat-round">0</div>
+            </div>
+            <div class="session-stat">
+                <div class="session-label">Rounds Done</div>
+                <div class="session-value" id="stat-rounds">0</div>
+            </div>
+        </div>
+
+        <div class="chips-section">
+            <div class="chips-grid">
+                <button class="chip chip-1"  id="chip-btn-1"  data-value="1">
+                    <span class="chip-value">+1<span class="chip-label">rep</span></span>
+                </button>
+                <button class="chip chip-3"  id="chip-btn-3"  data-value="3">
+                    <span class="chip-value">+3<span class="chip-label">reps</span></span>
+                </button>
+                <button class="chip chip-5"  id="chip-btn-5"  data-value="5">
+                    <span class="chip-value">+5<span class="chip-label">reps</span></span>
+                </button>
+                <button class="chip chip-10" id="chip-btn-10" data-value="10">
+                    <span class="chip-value">+10<span class="chip-label">reps</span></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="complete-section">
+            <button class="complete-btn" id="complete-btn">Complete Round</button>
+        </div>
+
+        <div class="history-section">
+            <div class="history-header">Round History</div>
+            <div class="round-list" id="round-list">
+                <div class="no-rounds-msg">No rounds completed yet</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="ctrl-btn" id="undo-btn" disabled>Undo</button>
+            <button class="ctrl-btn" id="reset-round-btn">Reset Round</button>
+            <button class="ctrl-btn dark" id="reset-session-btn">Reset Session</button>
+        </div>
+
+        <div id="status-msg" class="status-message"></div>
+
+        <div class="session-meta" id="session-meta"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
