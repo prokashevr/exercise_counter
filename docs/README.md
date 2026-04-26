@@ -13,15 +13,15 @@ A standalone, installable web app for counting reps with poker-chip-styled butto
 
 ## Live Demo
 
-https://<your-username>.github.io/exercise_counter/
+https://prokashevr.github.io/exercise_counter/
 
 ## Development
 
 Pure static site — no build step.
 
 ```bash
-# Serve locally
-cd pwa
+# Serve locally from repo root
+cd docs
 python3 -m http.server 8000
 # Open http://localhost:8000
 ```
@@ -31,7 +31,7 @@ For service-worker testing, use `localhost` (HTTPS not required) or deploy to Pa
 ## Project Structure
 
 ```
-pwa/
+docs/
 ├── index.html              # App shell
 ├── styles.css              # Extracted styles
 ├── app.js                  # Counter logic + SW registration
@@ -45,20 +45,23 @@ pwa/
     └── apple-touch-icon.png
 ```
 
+All paths inside the app are relative (`./`), so it runs correctly under any subpath — including `https://prokashevr.github.io/exercise_counter/`.
+
 To regenerate icons after editing `generate_icons.py`:
 
 ```bash
-python3 pwa/generate_icons.py
+python3 docs/generate_icons.py
 ```
 
 (Requires `numpy` and `opencv-python`.)
 
 ## Deployment (GitHub Pages)
 
-1. Push the `pwa/` folder to `master`.
-2. Repo → Settings → Pages → Source: **Deploy from a branch**.
-3. Branch: `master`, Folder: `/pwa`.
-4. App goes live at `https://<user>.github.io/<repo>/`.
+1. Push the `docs/` folder to `master`.
+2. Repo → **Settings → Pages**.
+3. **Source:** Deploy from a branch.
+4. **Branch:** `master`, **Folder:** `/docs`.
+5. App goes live at `https://<user>.github.io/exercise_counter/`.
 
 For a custom domain or build pipeline, add a workflow at `.github/workflows/deploy-pwa.yml`.
 

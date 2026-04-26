@@ -1,7 +1,7 @@
 """Generate PWA icons (poker-chip style) using OpenCV.
 
 Run from project root:
-    python pwa/generate_icons.py
+    python docs/generate_icons.py
 """
 import os
 import math
