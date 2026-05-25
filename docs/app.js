@@ -192,7 +192,34 @@ function registerSW() {
     });
 }
 
+let wakeLock = null;
+
+async function requestWakeLock() {
+    if (!('wakeLock' in navigator)) return;
+    if (wakeLock) return;
+    try {
+        wakeLock = await navigator.wakeLock.request('screen');
+        wakeLock.addEventListener('release', () => { wakeLock = null; });
+    } catch (err) {
+        console.warn('Wake Lock request failed:', err);
+    }
+}
+
+function setupWakeLock() {
+    requestWakeLock();
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') requestWakeLock();
+    });
+    // Backup: re-arm on first user interaction (some browsers gate behind a gesture)
+    const onFirstInteract = () => {
+        requestWakeLock();
+        document.removeEventListener('pointerdown', onFirstInteract);
+    };
+    document.addEventListener('pointerdown', onFirstInteract, { once: true });
+}
+
 loadState();
 bindEvents();
 render();
 registerSW();
+setupWakeLock();

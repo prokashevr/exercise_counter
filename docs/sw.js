@@ -1,4 +1,4 @@
-const CACHE_NAME = 'reps-counter-v1';
+const CACHE_NAME = 'reps-counter-v2';
 
 const SHELL_ASSETS = [
     './',
